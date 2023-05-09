@@ -1,10 +1,9 @@
-// 2d-mapgame.c
 // TODO: Description of your program.
-// test.c
+
 #include <stdio.h>
 
 // Additional libraries here
-
+#include <stdlib.h>
 
 // Provided constants 
 #define SIZE 8
@@ -41,21 +40,51 @@ void print_game_play_map(struct location map[SIZE][SIZE]);
 int main(void) {
 
     struct location map[SIZE][SIZE];
+    int num_pieces, points, row, col;
+    char command;
     init_map(map);
 
     printf("Welcome Explorer!!\n");
     printf("How many game pieces are on the map?\n");
     
     // TODO: Add code to scan in the number of game pieces here.
-    
+    // Stage 1.1
+    scanf("%d", &num_pieces);
+    printf("Enter the details of game pieces:\n");
+    for(int i=0; i<num_pieces; i++){
+	    scanf("%d %d %d", &points, &row, &col);
+	    if(row < 0 || row > 7  || col < 0 || col > 7 || points > 9 || points < -9) continue; // 맵 벗어나거나 데미지, 힐링 -9~9 사이 범위를 넘었을 경우
+	    if(row == 7 && col == 0) continue; // 플레이어 위치 조건
+	    if(points > 0){
+		map[row][col].occupier = HEALING_TYPE;
+		map[row][col].points = points;
+	    }else if(points < 0){
+		map[row][col].occupier = MONSTER_TYPE;
+		map[row][col].points = points;
+	    }else if(points == 0){
+		map[row][col].occupier = BOULDER_TYPE;
+		map[row][col].points = 0;
+	    }
+    }
+
     // TODO: Add code to scan in the details of each game piece and place them
     //       on the map
 
     // After the game pieces have been added to the map print out the map.
-    print_game_play_map(map);
-    printf("\nEXPLORE!\n");
-    printf("Enter command: ");
-
+    while(1){
+	    print_game_play_map(map);
+	    printf("\nEXPLORE!\n");
+	    printf("Enter command: ");
+	    // Stage 1.2
+	    getchar();
+	    command = getchar();
+	    if(command == 'c'){
+		print_cheat_map(map);
+	    }else if(command == 'q'){
+		printf("Exiting Program!\n");
+		exit(0);
+	    }
+    }
     // TODO: keep scanning in commands from the user until the user presses
     // ctrl + d
     
@@ -182,7 +211,7 @@ void print_cheat_map(struct location map[SIZE][SIZE]) {
             #ifndef NO_COLORS
             printf("\033[0m");
             #endif
-            // ----------------------------------------
+            // ----------OB------------------------------
             col++;
         }
         printf("|\n");
